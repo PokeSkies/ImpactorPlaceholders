@@ -9,10 +9,13 @@ val modId = project.properties["mod_id"].toString()
 version = project.properties["version"].toString()
 group = project.properties["group"].toString()
 
+val minecraftVersion = project.properties["minecraft_version"].toString()
+
 base.archivesBaseName = project.properties["mod_name"].toString()
 
 repositories {
     mavenCentral()
+    maven("https://maven.parchmentmc.org")
     maven( "https://jitpack.io")
     maven {
         name = "Modrinth"
@@ -46,8 +49,11 @@ configurations {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${project.properties["minecraft_version"].toString()}")
-    mappings("net.fabricmc:yarn:${project.properties["yarn_mappings"].toString()}:v2")
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+    mappings(loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-$minecraftVersion:2023.09.03@zip")
+    })
     modImplementation("net.fabricmc:fabric-loader:${project.properties["loader_version"].toString()}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.properties["fabric_kotlin_version"].toString()}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_version"].toString()}")
@@ -75,6 +81,10 @@ tasks.processResources {
     filesMatching("**/lang/*.json") {
         expand("id" to modId)
     }
+}
+
+tasks.remapJar {
+    archiveFileName.set("${project.name}-fabric-$minecraftVersion-${project.version}.jar")
 }
 
 tasks.withType<JavaCompile> {

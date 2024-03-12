@@ -7,10 +7,9 @@ import net.impactdev.impactor.api.economy.currency.Currency
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
 import java.util.*
 import java.util.concurrent.CompletableFuture
-
 
 object Utils {
     private val miniMessage: MiniMessage = MiniMessage.miniMessage()
@@ -34,7 +33,7 @@ object Utils {
     fun getCurrency(id: String?) : Optional<Currency> {
         if (id.isNullOrEmpty()) return Optional.empty()
 
-        val key = if (id.contains(":")) id else Identifier("impactor", id).toString()
+        val key = if (id.contains(":")) id else ResourceLocation("impactor", id).toString()
 
         val currency: Optional<Currency> = EconomyService.instance().currencies().currency(Key.key(key))
         if (currency.isEmpty) {

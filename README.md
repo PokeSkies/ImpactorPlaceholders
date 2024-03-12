@@ -5,28 +5,31 @@ A Fabric (1.20.1) server-sided Impactor placeholders extension. Adds useful Impa
 
 ## Placeholders
 ### MiniPlaceholders
-| Placeholder                             | Info                                                 | Return Type |
-| --------------------------------------- |------------------------------------------------------| ----------- |
-| <impactor_currency_plural:[currency]>   | Plural form of the default or provided currency      | string      |
-| <impactor_currency_singular:[currency]> | Singular form of the default or provided currency    | string      |
-| <impactor_currency_symbol:[currency]>   | Symbol the default or provided currency              | string      |
-| <impactor_balance:[currency]>           | Player's balance of the default or provided currency | double      |
+| Placeholder                             | Info                                                           | Return Type |
+|-----------------------------------------|----------------------------------------------------------------| ----------- |
+| <impactor_currency_plural:[currency]>   | Plural form of the default or provided currency                | string      |
+| <impactor_currency_singular:[currency]> | Singular form of the default or provided currency              | string      |
+| <impactor_currency_symbol:[currency]>   | Symbol the default or provided currency                        | string      |
+| <impactor_balance:[currency]>           | Player's balance of the default or provided currency           | double      |
+| <impactor_balance_short:[currency]>     | Shortened player's balance of the default or provided currency | double      |
 
 ### Impactor
-| Placeholder                                          | Info                                                 | Return Type |
-|------------------------------------------------------|------------------------------------------------------| ----------- |
-| <impactor_placeholders:currency_plural:[currency]>   | Plural form of the default or provided currency      | string      |
-| <impactor_placeholders:currency_singular:[currency]> | Singular form of the default or provided currency    | string      |
-| <impactor_placeholders:currency_symbol:[currency]>   | Symbol the default or provided currency              | string      |
-| <impactor_placeholders:balance:[currency]>           | Player's balance of the default or provided currency | double      |
+| Placeholder                                          | Info                                                           | Return Type |
+|------------------------------------------------------|----------------------------------------------------------------| ----------- |
+| <impactor_placeholders:currency_plural:[currency]>   | Plural form of the default or provided currency                | string      |
+| <impactor_placeholders:currency_singular:[currency]> | Singular form of the default or provided currency              | string      |
+| <impactor_placeholders:currency_symbol:[currency]>   | Symbol the default or provided currency                        | string      |
+| <impactor_placeholders:balance:[currency]>           | Player's balance of the default or provided currency           | double      |
+| <impactor_placeholders:balance_short:[currency]>     | Shortened player's balance of the default or provided currency | double      |
 
 ### PlaceholderAPI
-| Placeholder                             | Info                                                 | Return Type |
-| --------------------------------------- |------------------------------------------------------| ----------- |
-| %impactor:currency_plural [currency]%   | Plural form of the default or provided currency      | string      |
-| %impactor:currency_singular [currency]% | Singular form of the default or provided currency    | string      |
-| %impactor:currency_symbol [currency]%   | Symbol the default or provided currency              | string      |
-| %impactor:balance [currency]%           | Player's balance of the default or provided currency | double      |
+| Placeholder                             | Info                                                           | Return Type |
+|-----------------------------------------|----------------------------------------------------------------| ----------- |
+| %impactor:currency_plural [currency]%   | Plural form of the default or provided currency                | string      |
+| %impactor:currency_singular [currency]% | Singular form of the default or provided currency              | string      |
+| %impactor:currency_symbol [currency]%   | Symbol the default or provided currency                        | string      |
+| %impactor:balance [currency]%           | Player's balance of the default or provided currency           | double      |
+| %impactor:balance_short [currency]%     | Shortened player's balance of the default or provided currency | double      |
 
 ## Support
 A community support Discord has been opened up for all Skies Development related projects! Feel free to join and ask questions or leave suggestions :)

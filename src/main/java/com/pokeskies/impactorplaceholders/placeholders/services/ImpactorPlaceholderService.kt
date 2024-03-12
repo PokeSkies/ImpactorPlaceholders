@@ -106,5 +106,27 @@ class ImpactorPlaceholderService : IPlaceholderService {
                 Utils.getAccount(player.uuid(), currency).thenCompose(Account::balanceAsync).join().toDouble()
             )
         }
+        service.register(
+            Key.key("impactor_placeholders", "balance_short")
+        ) { viewer, ctx ->
+            val player: PlatformSource = ctx.require(PlatformSource::class.java)
+
+            var currency = EconomyService.instance().currencies().primary()
+
+            val arguments = ctx.request(PlaceholderArguments::class.java)
+            if (arguments.isPresent && arguments.get().hasNext()) {
+                val optCurrency = Utils.getCurrency(arguments.get().pop())
+                if (optCurrency.isEmpty)
+                    return@register Component.text(
+                        "Invalid currency argument provided!"
+                    )
+
+                currency = optCurrency.get()
+            }
+
+            val result = Utils.getAccount(player.uuid(), currency).thenCompose(Account::balanceAsync).join().toDouble()
+
+            return@register Component.text(if (result % 1 == 0.0) result.toInt().toString() else result.toString())
+        }
     }
 }

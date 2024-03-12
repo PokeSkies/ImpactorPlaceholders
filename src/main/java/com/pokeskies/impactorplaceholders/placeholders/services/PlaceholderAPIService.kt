@@ -7,7 +7,7 @@ import eu.pb4.placeholders.api.PlaceholderResult
 import eu.pb4.placeholders.api.Placeholders
 import net.impactdev.impactor.api.economy.EconomyService
 import net.impactdev.impactor.api.economy.accounts.Account
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
 
 class PlaceholderAPIService : IPlaceholderService {
     init {
@@ -15,7 +15,7 @@ class PlaceholderAPIService : IPlaceholderService {
     }
 
     override fun registerPlaceholders() {
-        Placeholders.register(Identifier("impactor", "currency_plural")) { ctx, arg ->
+        Placeholders.register(ResourceLocation("impactor", "currency_plural")) { ctx, arg ->
             var currency = EconomyService.instance().currencies().primary()
 
             if (!arg.isNullOrEmpty()) {
@@ -28,7 +28,7 @@ class PlaceholderAPIService : IPlaceholderService {
 
             PlaceholderResult.value(ImpactorPlaceholders.INSTANCE.adventure!!.toNative(currency.plural()))
         }
-        Placeholders.register(Identifier("impactor", "currency_singular")) { ctx, arg ->
+        Placeholders.register(ResourceLocation("impactor", "currency_singular")) { ctx, arg ->
             var currency = EconomyService.instance().currencies().primary()
 
             if (!arg.isNullOrEmpty()) {
@@ -41,7 +41,7 @@ class PlaceholderAPIService : IPlaceholderService {
 
             PlaceholderResult.value(ImpactorPlaceholders.INSTANCE.adventure!!.toNative(currency.singular()))
         }
-        Placeholders.register(Identifier("impactor", "currency_symbol")) { ctx, arg ->
+        Placeholders.register(ResourceLocation("impactor", "currency_symbol")) { ctx, arg ->
             var currency = EconomyService.instance().currencies().primary()
 
             if (!arg.isNullOrEmpty()) {
@@ -54,7 +54,7 @@ class PlaceholderAPIService : IPlaceholderService {
 
             PlaceholderResult.value(ImpactorPlaceholders.INSTANCE.adventure!!.toNative(currency.symbol()))
         }
-        Placeholders.register(Identifier("impactor", "balance")) { ctx, arg ->
+        Placeholders.register(ResourceLocation("impactor", "balance")) { ctx, arg ->
             if (!ctx.hasPlayer()) PlaceholderResult.invalid("No player!")
 
             var currency = EconomyService.instance().currencies().primary()
@@ -71,6 +71,23 @@ class PlaceholderAPIService : IPlaceholderService {
                 Utils.getAccount(ctx.player!!.uuid, currency)
                     .thenCompose(Account::balanceAsync).join().toDouble().toString()
             )
+        }
+        Placeholders.register(ResourceLocation("impactor", "balance_short")) { ctx, arg ->
+            if (!ctx.hasPlayer()) PlaceholderResult.invalid("No player!")
+
+            var currency = EconomyService.instance().currencies().primary()
+
+            if (!arg.isNullOrEmpty()) {
+                val optCurrency = Utils.getCurrency(arg)
+                if (optCurrency.isEmpty)
+                    PlaceholderResult.invalid("Invalid currency argument provided!")
+
+                currency = optCurrency.get()
+            }
+
+            val result = Utils.getAccount(ctx.player!!.uuid, currency).thenCompose(Account::balanceAsync).join().toDouble()
+
+            PlaceholderResult.value(if (result % 1 == 0.0) result.toInt().toString() else result.toString())
         }
     }
 }

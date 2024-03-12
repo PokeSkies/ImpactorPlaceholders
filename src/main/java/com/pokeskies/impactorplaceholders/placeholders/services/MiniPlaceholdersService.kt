@@ -9,7 +9,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.level.ServerPlayer
 
 class MiniPlaceholdersService : IPlaceholderService {
     private val miniMessage = MiniMessage.builder()
@@ -67,9 +67,9 @@ class MiniPlaceholdersService : IPlaceholderService {
 
                 return@globalPlaceholder Tag.inserting(currency.symbol())
             }
-            .filter(ServerPlayerEntity::class.java)
+            .filter(ServerPlayer::class.java)
             .audiencePlaceholder("balance") { audience, queue, _ ->
-                val player = audience as ServerPlayerEntity
+                val player = audience as ServerPlayer
 
                 var currency = EconomyService.instance().currencies().primary()
 
@@ -86,6 +86,27 @@ class MiniPlaceholdersService : IPlaceholderService {
                 return@audiencePlaceholder Tag.inserting(Component.text(
                     Utils.getAccount(player.uuid, currency).thenCompose(Account::balanceAsync).join().toDouble()
                 ))
+            }
+            .audiencePlaceholder("balance_short") { audience, queue, _ ->
+                val player = audience as ServerPlayer
+
+                var currency = EconomyService.instance().currencies().primary()
+
+                if (queue.peek() != null) {
+                    val optCurrency = Utils.getCurrency(queue.peek()?.value())
+                    if (optCurrency.isEmpty)
+                        return@audiencePlaceholder Tag.inserting(Component.text(
+                            "Invalid currency argument provided!"
+                        ))
+
+                    currency = optCurrency.get()
+                }
+
+                val result = Utils.getAccount(player.uuid, currency).thenCompose(Account::balanceAsync).join().toDouble()
+
+                return@audiencePlaceholder Tag.inserting(
+                    Component.text(if (result % 1 == 0.0) result.toInt().toString() else result.toString())
+                )
             }
 
         builder.build().register()
