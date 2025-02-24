@@ -33,7 +33,7 @@ object Utils {
     fun getCurrency(id: String?) : Optional<Currency> {
         if (id.isNullOrEmpty()) return Optional.empty()
 
-        val key = if (id.contains(":")) id else ResourceLocation("impactor", id).toString()
+        val key = if (id.contains(":")) id else ResourceLocation.fromNamespaceAndPath("impactor", id).toString()
 
         val currency: Optional<Currency> = EconomyService.instance().currencies().currency(Key.key(key))
         if (currency.isEmpty) {

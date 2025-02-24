@@ -15,7 +15,7 @@ class PlaceholderAPIService : IPlaceholderService {
     }
 
     override fun registerPlaceholders() {
-        Placeholders.register(ResourceLocation("impactor", "currency_plural")) { ctx, arg ->
+        Placeholders.register(ResourceLocation.fromNamespaceAndPath("impactor", "currency_plural")) { ctx, arg ->
             var currency = EconomyService.instance().currencies().primary()
 
             if (!arg.isNullOrEmpty()) {
@@ -28,7 +28,7 @@ class PlaceholderAPIService : IPlaceholderService {
 
             PlaceholderResult.value(ImpactorPlaceholders.INSTANCE.adventure!!.toNative(currency.plural()))
         }
-        Placeholders.register(ResourceLocation("impactor", "currency_singular")) { ctx, arg ->
+        Placeholders.register(ResourceLocation.fromNamespaceAndPath("impactor", "currency_singular")) { ctx, arg ->
             var currency = EconomyService.instance().currencies().primary()
 
             if (!arg.isNullOrEmpty()) {
@@ -41,7 +41,7 @@ class PlaceholderAPIService : IPlaceholderService {
 
             PlaceholderResult.value(ImpactorPlaceholders.INSTANCE.adventure!!.toNative(currency.singular()))
         }
-        Placeholders.register(ResourceLocation("impactor", "currency_symbol")) { ctx, arg ->
+        Placeholders.register(ResourceLocation.fromNamespaceAndPath("impactor", "currency_symbol")) { ctx, arg ->
             var currency = EconomyService.instance().currencies().primary()
 
             if (!arg.isNullOrEmpty()) {
@@ -54,7 +54,7 @@ class PlaceholderAPIService : IPlaceholderService {
 
             PlaceholderResult.value(ImpactorPlaceholders.INSTANCE.adventure!!.toNative(currency.symbol()))
         }
-        Placeholders.register(ResourceLocation("impactor", "balance")) { ctx, arg ->
+        Placeholders.register(ResourceLocation.fromNamespaceAndPath("impactor", "balance")) { ctx, arg ->
             if (!ctx.hasPlayer()) PlaceholderResult.invalid("No player!")
 
             var currency = EconomyService.instance().currencies().primary()
@@ -72,7 +72,7 @@ class PlaceholderAPIService : IPlaceholderService {
                     .thenCompose(Account::balanceAsync).join().toDouble().toString()
             )
         }
-        Placeholders.register(ResourceLocation("impactor", "balance_short")) { ctx, arg ->
+        Placeholders.register(ResourceLocation.fromNamespaceAndPath("impactor", "balance_short")) { ctx, arg ->
             if (!ctx.hasPlayer()) PlaceholderResult.invalid("No player!")
 
             var currency = EconomyService.instance().currencies().primary()
