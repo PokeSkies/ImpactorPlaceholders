@@ -54,7 +54,7 @@ object ImpactorUtils {
     }
 
     fun formatShort(value: BigDecimal, decimals: Int?, strip: Boolean = false): String {
-        var formatted = createCompactFormatter(decimals ?: 2, strip).format(value)
+        var formatted = createCompactFormatter(decimals ?: 2).format(value)
 
         if (strip) {
             val index = formatted.indexOfLast { it.isDigit() || it == '.' }
