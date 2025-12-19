@@ -1,21 +1,27 @@
 package com.pokeskies.impactorplaceholders.placeholders.services
 
-import com.pokeskies.impactorplaceholders.placeholders.IPlaceholderService
+import com.pokeskies.impactorplaceholders.ImpactorPlaceholders
+import com.pokeskies.impactorplaceholders.placeholders.PlayerPlaceholder
+import com.pokeskies.impactorplaceholders.placeholders.ServerPlaceholder
 import com.pokeskies.impactorplaceholders.utils.Utils
 import net.impactdev.impactor.api.Impactor
-import net.impactdev.impactor.api.economy.EconomyService
-import net.impactdev.impactor.api.economy.accounts.Account
+import net.impactdev.impactor.api.platform.players.PlatformPlayer
 import net.impactdev.impactor.api.platform.sources.PlatformSource
 import net.impactdev.impactor.api.text.TextProcessor
 import net.impactdev.impactor.api.text.placeholders.PlaceholderArguments
 import net.impactdev.impactor.api.text.placeholders.PlaceholderService
+import net.impactdev.impactor.api.utility.Context
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import net.minecraft.server.level.ServerPlayer
+import kotlin.jvm.optionals.getOrNull
 
 
 class ImpactorPlaceholderService : IPlaceholderService {
+    private val keyId = "impactor_placeholders"
+    private val service = Impactor.instance().services().provide(PlaceholderService::class.java)
     private val processor = TextProcessor.mini(
         MiniMessage.builder()
             .tags(TagResolver.builder().build())
@@ -26,107 +32,58 @@ class ImpactorPlaceholderService : IPlaceholderService {
         Utils.printInfo("Impactor mod found! Registering placeholders...")
     }
 
-    override fun registerPlaceholders() {
-        val service = Impactor.instance().services().provide(PlaceholderService::class.java)
-
-        service.register(
-            Key.key("impactor_placeholders", "currency_plural")
-        ) { viewer, ctx ->
-            var currency = EconomyService.instance().currencies().primary()
-
-            val arguments = ctx.request(PlaceholderArguments::class.java)
-            if (arguments.isPresent && arguments.get().hasNext()) {
-                val optCurrency = Utils.getCurrency(arguments.get().pop())
-                if (optCurrency.isEmpty) {
-                    return@register Component.text(
-                        "Invalid currency argument provided!"
-                    )
+    override fun registerPlayer(placeholder: PlayerPlaceholder) {
+        placeholder.ids().forEach { id ->
+            service.register(
+                Key.key(keyId, id)
+            ) { viewer, ctx ->
+                val platformPlayer: PlatformSource = ctx.require(PlatformSource::class.java)
+                val player = ImpactorPlaceholders.INSTANCE.server.playerList.getPlayer(platformPlayer.uuid()) ?: run {
+                    return@register Component.text("No Player")
                 }
 
-                currency = optCurrency.get()
+                val arguments = ctx.request(PlaceholderArguments::class.java).getOrNull()?.let {
+                    val args = mutableListOf<String>()
+                    while (it.hasNext()) {
+                        args.add(it.pop())
+                    }
+                    args.toList()
+                } ?: emptyList()
+
+                return@register placeholder.handle(player, arguments).component
             }
-
-            return@register currency.plural()
         }
-        service.register(
-            Key.key("impactor_placeholders", "currency_singular")
-        ) { viewer, ctx ->
-            var currency = EconomyService.instance().currencies().primary()
+    }
 
-            val arguments = ctx.request(PlaceholderArguments::class.java)
-            if (arguments.isPresent && arguments.get().hasNext()) {
-                val optCurrency = Utils.getCurrency(arguments.get().pop())
-                if (optCurrency.isEmpty)
-                    return@register Component.text(
-                        "Invalid currency argument provided!"
-                    )
+    override fun registerServer(placeholder: ServerPlaceholder) {
+        placeholder.ids().forEach { id ->
+            service.register(
+                Key.key(keyId, id)
+            ) { viewer, ctx ->
+                val arguments = ctx.request(PlaceholderArguments::class.java).getOrNull()?.let {
+                    val args = mutableListOf<String>()
+                    while (it.hasNext()) {
+                        args.add(it.pop())
+                    }
+                    args.toList()
+                } ?: emptyList()
 
-                currency = optCurrency.get()
+                return@register placeholder.handle(arguments).component
             }
-
-            return@register currency.singular()
         }
-        service.register(
-            Key.key("impactor_placeholders", "currency_symbol")
-        ) { viewer, ctx ->
-            var currency = EconomyService.instance().currencies().primary()
+    }
 
-            val arguments = ctx.request(PlaceholderArguments::class.java)
-            if (arguments.isPresent && arguments.get().hasNext()) {
-                val optCurrency = Utils.getCurrency(arguments.get().pop())
-                if (optCurrency.isEmpty)
-                    return@register Component.text(
-                        "Invalid currency argument provided!"
-                    )
+    override fun finalizeRegister() {
 
-                currency = optCurrency.get()
-            }
+    }
 
-            return@register currency.symbol()
+    override fun parse(input: String, player: ServerPlayer?): String {
+        val parsed = if (player != null) {
+            val platformPlayer = PlatformPlayer.getOrCreate(player.uuid)
+            processor.parse(platformPlayer, input, Context().append(PlatformSource::class.java, platformPlayer))
+        } else {
+            processor.parse(input)
         }
-        service.register(
-            Key.key("impactor_placeholders", "balance")
-        ) { viewer, ctx ->
-            val player: PlatformSource = ctx.require(PlatformSource::class.java)
-
-            var currency = EconomyService.instance().currencies().primary()
-
-            val arguments = ctx.request(PlaceholderArguments::class.java)
-            if (arguments.isPresent && arguments.get().hasNext()) {
-                val optCurrency = Utils.getCurrency(arguments.get().pop())
-                if (optCurrency.isEmpty)
-                    return@register Component.text(
-                        "Invalid currency argument provided!"
-                    )
-
-                currency = optCurrency.get()
-            }
-
-            return@register Component.text(
-                Utils.getAccount(player.uuid(), currency).thenCompose(Account::balanceAsync).join().toDouble()
-            )
-        }
-        service.register(
-            Key.key("impactor_placeholders", "balance_short")
-        ) { viewer, ctx ->
-            val player: PlatformSource = ctx.require(PlatformSource::class.java)
-
-            var currency = EconomyService.instance().currencies().primary()
-
-            val arguments = ctx.request(PlaceholderArguments::class.java)
-            if (arguments.isPresent && arguments.get().hasNext()) {
-                val optCurrency = Utils.getCurrency(arguments.get().pop())
-                if (optCurrency.isEmpty)
-                    return@register Component.text(
-                        "Invalid currency argument provided!"
-                    )
-
-                currency = optCurrency.get()
-            }
-
-            val result = Utils.getAccount(player.uuid(), currency).thenCompose(Account::balanceAsync).join().toDouble()
-
-            return@register Component.text(if (result % 1 == 0.0) result.toInt().toString() else result.toString())
-        }
+        return ImpactorPlaceholders.INSTANCE.adventure.toNative(parsed).string
     }
 }

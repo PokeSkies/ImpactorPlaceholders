@@ -1,18 +1,14 @@
 package com.pokeskies.impactorplaceholders.utils
 
 import com.pokeskies.impactorplaceholders.ImpactorPlaceholders
-import net.impactdev.impactor.api.economy.EconomyService
-import net.impactdev.impactor.api.economy.accounts.Account
-import net.impactdev.impactor.api.economy.currency.Currency
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.minecraft.resources.ResourceLocation
-import java.util.*
-import java.util.concurrent.CompletableFuture
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+
 
 object Utils {
-    private val miniMessage: MiniMessage = MiniMessage.miniMessage()
+    val miniMessage: MiniMessage = MiniMessage.miniMessage()
+    val plainTextSerializer = PlainTextComponentSerializer.plainText()
 
     fun deserializeText(text: String): Component {
         return miniMessage.deserialize(text)
@@ -24,24 +20,5 @@ object Utils {
 
     fun printInfo(message: String) {
         ImpactorPlaceholders.LOGGER.info("[ImpactorPlaceholders] $message")
-    }
-
-    fun getAccount(uuid: UUID, currency: Currency): CompletableFuture<Account> {
-        return EconomyService.instance().account(currency, uuid)
-    }
-
-    fun getCurrency(id: String?) : Optional<Currency> {
-        if (id.isNullOrEmpty()) return Optional.empty()
-
-        val key = if (id.contains(":")) id else ResourceLocation.fromNamespaceAndPath("impactor", id).toString()
-
-        val currency: Optional<Currency> = EconomyService.instance().currencies().currency(Key.key(key))
-        if (currency.isEmpty) {
-            printError("Could not find a currency by the ID $id! Valid currencies: " +
-                    "${EconomyService.instance().currencies().registered().map { it.key() } }")
-            return Optional.empty()
-        }
-
-        return currency
     }
 }
