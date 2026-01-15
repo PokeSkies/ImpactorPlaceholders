@@ -28,6 +28,7 @@ class ImpactorPlaceholders : ModInitializer {
         INSTANCE = this
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting { server ->
+            this.server = server
             this.adventure = FabricServerAudiences.of(
                 server!!
             )
