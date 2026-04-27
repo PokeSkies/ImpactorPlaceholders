@@ -32,8 +32,9 @@ class ImpactorPlaceholders : ModInitializer {
             this.adventure = FabricServerAudiences.of(
                 server!!
             )
+        })
+        ServerLifecycleEvents.SERVER_STARTED.register(ServerLifecycleEvents.ServerStarted { server ->
             Utils.printInfo("Registering placeholders...")
-
             this.placeholderServices = PlaceholderServices.getActiveServices()
             registerPlaceholders()
             Utils.printInfo("All placeholders now registered!")
